@@ -1,177 +1,151 @@
-# 外卖配送骑手端应用 - 技术架构文档
+# PulseTrack - 健身训练应用 - 技术架构文档
 
 ## 1. Architecture Design
 
 ```mermaid
 graph TB
-    subgraph "Frontend (Next.js 15)"
-        A[Pages/路由层]
-        B[Components/组件层]
-        C[State/状态管理]
-        D[Utils/工具层]
+    subgraph "Frontend (Next.js 15 + React)"
+        A[App Router Pages] --> B[React Components]
+        B --> C[Tailwind CSS + shadcn/ui]
+        C --> D[Zustand State Management]
     end
     
     subgraph "Data Layer"
-        E[Mock数据]
-        F[API接口预留]
+        E[Mock Data Layer] --> F[Type Definitions]
     end
     
-    A --> B
-    B --> C
-    B --> D
-    C --> E
-    D --> F
+    subgraph "External Services"
+        G[Vercel Deployment]
+    end
+    
+    A --> E
+    A --> G
 ```
 
 ## 2. Technology Description
 
-- **Frontend**: Next.js 15 + React 18 + TypeScript + Tailwind CSS
-- **UI Components**: shadcn/ui
+- **Frontend**: Next.js@15 + React@18 + TypeScript@5 + tailwindcss@3
+- **Initialization Tool**: create-next-app
+- **State Management**: Zustand
 - **Icons**: lucide-react
-- **State Management**: React Context API + Hooks
-- **Routing**: Next.js App Router
-- **Build Tool**: Next.js Built-in
+- **Styling**: Tailwind CSS + shadcn/ui 风格组件
 - **Deployment**: Vercel
 
 ## 3. Route Definitions
 
 | Route | Purpose |
 |-------|---------|
-| / | 待接单页面（首页） |
-| /order/[id] | 订单详情页 |
-| /navigation/[id] | 导航取货页 |
-| /pickup/[id] | 确认取货页 |
-| /complete/[id] | 任务完成页 |
-| /history | 历史订单页 |
-| /wallet | 钱包页 |
-| /profile | 个人中心页 |
+| / | 首页 - 今日训练计划、训练历史 |
+| /login | 登录/注册页面 |
+| /workout | 训练打卡页面 |
+| /stats | 数据统计页面 |
+| /profile | 个人中心页面 |
 
-## 4. Data Types
+## 4. Data Model
 
-### 4.1 Order Type
+### 4.1 Type Definitions
 
 ```typescript
-interface Order {
-  id: string;
-  orderNumber: string;
-  type: '配送' | '特快送';
-  status: 'pending' | 'accepted' | 'picking' | 'delivering' | 'completed';
-  merchant: {
-    name: string;
-    address: string;
-    phone: string;
-    tags: string[];
-  };
-  user: {
-    name: string;
-    address: string;
-    phone: string;
-  };
-  distance: number;
-  estimatedTime: number;
-  payment: number;
-  subsidy?: number;
-  items: OrderItem[];
-  pickupCode?: string;
-  createdAt: string;
-}
-
-interface OrderItem {
+// 用户信息
+interface User {
   id: string;
   name: string;
-  quantity: number;
-  note?: string;
-  checked: boolean;
+  avatar: string;
+  level: number;
+  bio: string;
+}
+
+// 身体数据
+interface BodyStats {
+  height: number;
+  weight: number;
+  bodyFat: number;
+  bmi: number;
+}
+
+// 训练动作
+interface Exercise {
+  id: string;
+  name: string;
+  muscleGroup: string;
+  icon: string;
+}
+
+// 训练组记录
+interface WorkoutSet {
+  id: string;
+  exerciseId: string;
+  weight: number;
+  reps: number;
+  completed: boolean;
+}
+
+// 训练记录
+interface WorkoutRecord {
+  id: string;
+  date: string;
+  exercises: Exercise[];
+  sets: WorkoutSet[];
+  duration: number;
+  totalVolume: number;
+}
+
+// 统计数据
+interface Statistics {
+  weeklyVolume: number[];
+  muscleGroupDistribution: Record<string, number>;
+  prs: Record<string, number>;
 }
 ```
 
-### 4.2 Wallet Type
-
-```typescript
-interface Wallet {
-  balance: number;
-  todayEarnings: number;
-  totalOrders: number;
-}
-```
-
-## 5. File Structure
+## 5. Project Structure
 
 ```
 /workspace
-├── app/
-│   ├── layout.tsx
-│   ├── page.tsx                    # 待接单页
-│   ├── globals.css
-│   ├── order/
-│   │   └── [id]/
-│   │       └── page.tsx           # 订单详情页
-│   ├── navigation/
-│   │   └── [id]/
-│   │       └── page.tsx           # 导航取货页
-│   ├── pickup/
-│   │   └── [id]/
-│   │       └── page.tsx           # 确认取货页
-│   ├── complete/
-│   │   └── [id]/
-│   │       └── page.tsx           # 任务完成页
-│   ├── history/
-│   │   └── page.tsx               # 历史订单页
-│   ├── wallet/
-│   │   └── page.tsx               # 钱包页
+├── app/                          # Next.js App Router
+│   ├── layout.tsx               # 根布局
+│   ├── globals.css              # 全局样式
+│   ├── page.tsx                 # 首页
+│   ├── login/
+│   │   └── page.tsx             # 登录页
+│   ├── workout/
+│   │   └── page.tsx             # 训练打卡页
+│   ├── stats/
+│   │   └── page.tsx             # 统计页
 │   └── profile/
-│       └── page.tsx               # 个人中心页
+│       └── page.tsx             # 个人中心页
 ├── components/
-│   ├── ui/                        # shadcn/ui 组件
+│   ├── ui/                      # shadcn/ui 风格组件
 │   │   ├── button.tsx
 │   │   ├── card.tsx
-│   │   ├── badge.tsx
 │   │   ├── input.tsx
-│   │   └── ...
-│   ├── layout/
-│   │   ├── Header.tsx
-│   │   └── BottomNav.tsx
-│   ├── shared/
-│   │   ├── OrderCard.tsx
-│   │   ├── MapView.tsx
-│   │   └── OrderItemList.tsx
-│   └── ...
+│   │   └── badge.tsx
+│   ├── layout/                  # 布局组件
+│   │   └── Header.tsx
+│   └── shared/                  # 共享组件
+│       ├── ExerciseCard.tsx
+│       ├── WorkoutHistoryCard.tsx
+│       └── Chart.tsx
 ├── lib/
-│   ├── mock/
-│   │   ├── orders.ts
-│   │   └── wallet.ts
-│   ├── types/
+│   ├── types/                   # 类型定义
 │   │   └── index.ts
-│   └── utils.ts
-├── public/
+│   ├── mock/                    # Mock 数据
+│   │   └── data.ts
+│   ├── store/                   # Zustand 状态管理
+│   │   └── useAppStore.ts
+│   └── utils.ts                 # 工具函数
 ├── package.json
 ├── tsconfig.json
 ├── tailwind.config.ts
-├── next.config.ts
-└── vercel.json
+└── next.config.ts
 ```
 
-## 6. State Management
+## 6. Key Implementation Guidelines
 
-使用 React Context API 管理全局状态：
-
-```typescript
-interface AppContextType {
-  orders: Order[];
-  currentOrder: Order | null;
-  setCurrentOrder: (order: Order | null) => void;
-  acceptOrder: (orderId: string) => void;
-  completeOrder: (orderId: string) => void;
-}
-```
-
-## 7. Mock Data Structure
-
-- `lib/mock/orders.ts`: 订单模拟数据
-- `lib/mock/wallet.ts`: 钱包模拟数据
-
-## 8. Deployment Configuration
-
-- `vercel.json`: Vercel 部署配置
-- `next.config.ts`: Next.js 配置
-- 支持 GitHub 自动部署
+1. **State Management**: Use Zustand for global state
+2. **Styling**: Use Tailwind CSS for all styling
+3. **Components**: Build reusable UI components
+4. **Mock Data**: Implement comprehensive mock data
+5. **Animations**: Add subtle animations and transitions
+6. **Responsive**: Perfect mobile and desktop support
+7. **Accessibility**: Semantic HTML and ARIA attributes

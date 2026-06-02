@@ -3,61 +3,34 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  ClipboardList, 
-  History, 
-  Wallet, 
-  User 
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Home, Dumbbell, BarChart3, User } from 'lucide-react';
 
-interface NavItem {
-  href: string;
-  label: string;
-  icon: React.ReactNode;
-}
-
-const navItems: NavItem[] = [
-  {
-    href: '/',
-    label: '任务',
-    icon: <ClipboardList className="h-6 w-6" />,
-  },
-  {
-    href: '/history',
-    label: '历史',
-    icon: <History className="h-6 w-6" />,
-  },
-  {
-    href: '/wallet',
-    label: '钱包',
-    icon: <Wallet className="h-6 w-6" />,
-  },
-  {
-    href: '/profile',
-    label: '我的',
-    icon: <User className="h-6 w-6" />,
-  },
+const navItems = [
+  { href: '/', label: '首页', icon: Home },
+  { href: '/workout', label: '训练', icon: Dumbbell },
+  { href: '/stats', label: '统计', icon: BarChart3 },
+  { href: '/profile', label: '我的', icon: User },
 ];
 
-export function BottomNav() {
+export const BottomNav: React.FC = () => {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100">
       <div className="flex items-center justify-around h-16">
         {navItems.map((item) => {
+          const Icon = item.icon;
           const isActive = pathname === item.href;
+          
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={cn(
-                'flex flex-col items-center justify-center gap-1 flex-1 py-2 transition-colors',
+              className={`flex flex-col items-center justify-center gap-1 flex-1 py-2 transition-all ${
                 isActive ? 'text-primary' : 'text-gray-500'
-              )}
+              }`}
             >
-              {item.icon}
+              <Icon className="w-6 h-6" />
               <span className="text-xs font-medium">{item.label}</span>
             </Link>
           );
@@ -65,4 +38,4 @@ export function BottomNav() {
       </div>
     </nav>
   );
-}
+};

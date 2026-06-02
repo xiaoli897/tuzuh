@@ -1,51 +1,58 @@
-export interface OrderItem {
+// 用户信息
+export interface User {
   id: string;
   name: string;
-  quantity: number;
-  note?: string;
-  checked: boolean;
+  avatar: string;
+  level: number;
+  bio: string;
 }
 
-export interface Order {
+// 身体数据
+export interface BodyStats {
+  height: number;
+  weight: number;
+  bodyFat: number;
+  bmi: number;
+}
+
+// 训练动作
+export interface Exercise {
   id: string;
-  orderNumber: string;
-  type: '配送' | '特快送';
-  status: 'pending' | 'accepted' | 'picking' | 'delivering' | 'completed';
-  merchant: {
-    name: string;
-    address: string;
-    phone: string;
-    tags: string[];
-    image?: string;
-  };
-  user: {
-    name: string;
-    address: string;
-    phone: string;
-  };
-  distance: number;
-  estimatedTime: number;
-  payment: number;
-  subsidy?: number;
-  items: OrderItem[];
-  pickupCode?: string;
-  createdAt: string;
-  earnings?: {
-    base: number;
-    distance: number;
-    onTime: number;
-    weight: number;
-    tip: number;
-    bonus?: number;
-  };
-  deliveryStats?: {
-    distance: number;
-    time: number;
-  };
+  name: string;
+  muscleGroup: string;
+  icon: string;
 }
 
-export interface Wallet {
-  balance: number;
-  todayEarnings: number;
-  totalOrders: number;
+// 训练组记录
+export interface WorkoutSet {
+  id: string;
+  exerciseId: string;
+  weight: number;
+  reps: number;
+  completed: boolean;
+}
+
+// 训练记录
+export interface WorkoutRecord {
+  id: string;
+  date: string;
+  exercises: Exercise[];
+  sets: WorkoutSet[];
+  duration: number;
+  totalVolume: number;
+}
+
+// 统计数据
+export interface Statistics {
+  weeklyVolume: number[];
+  muscleGroupDistribution: Record<string, number>;
+  prs: Record<string, number>;
+}
+
+// 目标进度
+export interface GoalProgress {
+  targetWeight: number;
+  targetBodyFat: number;
+  currentWeight: number;
+  currentBodyFat: number;
 }

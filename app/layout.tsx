@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { AppProvider } from '@/lib/context/AppContext';
+import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
 
 export const metadata: Metadata = {
-  title: '骑手配送端',
-  description: '外卖配送骑手接单系统',
+  title: 'PulseTrack - 健身训练记录',
+  description: '专业的健身训练记录与数据追踪应用',
 };
 
 export default function RootLayout({
@@ -15,11 +15,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
-      <body className="min-h-screen bg-gray-50 pb-20">
-        <AppProvider>
+      <body className="min-h-screen bg-gray-50">
+        <Header />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
           {children}
-          <BottomNav />
-        </AppProvider>
+        </main>
+        <BottomNav />
       </body>
     </html>
   );
